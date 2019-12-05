@@ -1,8 +1,8 @@
-from peewee import PostgresDatabase, Model, CharField, DateField
+from peewee import PostgresqlDatabase, Model, CharField, DateField
 import random
 
-db = PostgresDatabase('flashcards', user='postgres',
-                      password='',           host='localhost', port=5432)
+db = PostgresqlDatabase('flashcards', user='postgres',
+                        password='', host='localhost', port=5432)
 
 db.connect()
 
@@ -48,18 +48,53 @@ range_method = Flashcard(
 range_method.save()
 
 
-# def flash_quiz():
-#     print("Welcome to Python Flashcards! I give you a question about Python, and you guess the answer. Here we go!")
+def flash_quiz():
+    points = 0
+    total_questions = 0
+    print("Welcome to Python Flashcards! I give you a question about Python, and you guess the answer. Here we go!")
+    number = int(
+        input("How many flashcards would you like to quiz yourself on?"))
+    array = Flashcard.select()
+    array = array[:number]
+    for flashcard in array:
+        question = flashcard.question
+        answer = flashcard.answer
+        guess = input(question)
+        if (guess == answer):
+            points += 1
+            total_questions += 1
+            print("Great job!")
+            print(
+                f"You have {points} points out of {total_questions} total questions")
+        else:
+            total_questions += 1
+            print(f"Incorrect! The correct answer is{answer}")
+            print(
+                f"You have {points} points out of{total_questions} total questions")
+            play_again = input(
+                "Wow! Great effort! Do you want to play again? (y/n)")
+            if play_again == "y":
+                flash_quiz()
+            else:
+                print("Goodbye!")
 
 
-res = input("would you like to create a new flashcard (type "new") or quiz youself with existing flashcards (type "quiz")? (new / quiz) ")
+def viewAll():
+    for i in Flashcard.select():
+        print('question:' + i.question + 'answer:' + i.answer)
+
+
+res = input("would you like to create a new flashcard (type 'new') or quiz youself with existing flashcards (type 'quiz') or view all flashcards (type 'view')? (new / quiz / view) ")
 if res == 'new':
     new_question = input("please type the new flashcard question: ")
-    new_answer = int(input("please type the answer to the new flashcard: "))
-    new_flashcard = Flashcard(question=new_question, answer=new_answer
-    new_flashcard.save()  # new person is stored in the db
+    new_answer = input("please type the answer to the new flashcard: ")
+    new_flashcard = Flashcard(question=new_question, answer=new_answer)
+    new_flashcard.save()
     print(
         f"\nYou saved a new flashcard!\n{new_flashcard.question}\n{new_flashcard.answer} \n ")
 
 elif res == 'quiz':
     flash_quiz()
+
+elif res == 'view':
+    viewAll()
